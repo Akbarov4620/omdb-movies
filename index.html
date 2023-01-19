@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+</head>
+<body>
+    <div class="container">
+        <div class="movies__body">
+            <h2>Search Movies</h2>
+
+            <form data-movie-form>
+                <input type="text" name="name">
+                <button type="submit">
+                    <span class="material-symbols-outlined">
+                    search
+                    </span>
+                </button>
+            </form>
+            <ul data-movie-list></ul>
+        </div>
+
+        <div class="modal" id="modal" data-movie-modal>
+            <div class="modal__contend">
+                <img src="" alt="" width="150px" height="200" data-movie-poster>
+                <div class="modal__contend-text">
+                    <button type="button" data-button-close>&#10005</button>
+                    <p data-movie-title>title</p>
+                    <p data-movie-year>2022</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/modal.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
