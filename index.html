@@ -15,18 +15,14 @@
             <h2>Search Movies</h2>
 
             <form data-movie-form>
-                <input type="text" minlength="3" name="name" class="form-control" placeholder="Title">
+                <input type="text" minlength="3" name="name" class="form-control" placeholder="Title" data-input-name>
                 <input type="number" name="year" class="form-control input-year" placeholder="Year">
                 <select class="form-select" name="type" aria-label="Default select example">
+                    <option selected value="">All</option>
                     <option value="movie">movie</option>
                     <option value="series">series</option>
                     <option value="episode">episode</option>
-                  </select>
-                <button type="submit" class="btn btn-primary d-flex align-items-center">
-                    <span class="material-symbols-outlined">
-                    search
-                    </span>
-                </button>
+                </select>
             </form>
             <ul data-movie-list class="p-0"></ul>
 

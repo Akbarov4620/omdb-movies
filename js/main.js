@@ -6,18 +6,24 @@ const elForm = document.querySelector("[data-movie-form]");
 const elList = document.querySelector("[data-movie-list]");
 const elPagination = document.querySelector("[data-movie-pagination]");
 const elMovieModal = document.querySelector("[data-movie-modal]");
+const elInputMovie = document.querySelector("[data-input-name]");
+const formData = new FormData(elForm);
 
-elForm.addEventListener("submit", (evt) => {
+elInputMovie.addEventListener(
+  "keyup",
+  debounce((evt) => onInputKeyUp(evt), 300)
+);
+
+elForm.addEventListener("change", (evt) => {
   evt.preventDefault();
 
-  const formData = new FormData(elForm);
-  const name = formData.get("name");
-  const year = formData.get("year");
-  const type = formData.get("type");
-  searchMovies(name, year, type);
+  if (elInputMovie.value.length < 3) return;
+
+  searchMovies();
 });
 
-async function searchMovies(query, year, type, page = 1) {
+async function searchMovies(page = 1) {
+  const {query, year, type } = getFormData();
   elList.innerHTML = `<div class="loading"><div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>`;
   let res = await fetch(
     `${API_URL}&s=${query}&y=${year}&type=${type}&page=${page}`
@@ -32,9 +38,6 @@ async function searchMovies(query, year, type, page = 1) {
   renderMovies(searchResult.Search);
   renderPagination(
     Math.ceil(+searchResult.totalResults / 10),
-    query,
-    year,
-    type,
     page
   );
 }
@@ -62,29 +65,39 @@ function renderMovies(movies) {
   elList.innerHTML = html;
 }
 
-function renderPagination(totalPages, query, page) {
+function renderPagination(totalPages, page) {
   elPagination.innerHTML = "";
   let html = "";
 
-  html += `<li class="page-item ${+page === 1 ? "disabled" : ""}">
-  <a class="page-link" data-movie-page=${
+  html += ` <li class="page-item${+page === 1 ? " disabled" : ""} ">
+  <a class="page-link" data-movie-page=${+page - 1} href="?page=${
     +page - 1
-  } data-movie-query="${query}" href="?page=${+page - 1}">Previous</a>
+  }" tabindex="-1" aria-disabled="true">Previous</a>
 </li>`;
 
   for (let i = 1; i <= totalPages; i++) {
     html += `<li class="page-item${
       +page === i ? " active" : ""
-    }"><a class="page-link" data-movie-page=${i} data-movie-query="${query}" href="?page=${i}">${i}</a></li>`;
+    } "><a class="page-link" data-movie-page=${i} href="?page=${i}">${i}</a></li>`;
   }
 
-  html += `<li class="page-item ${+page === totalPages ? " disabled" : ""}">
-  <a class="page-link" data-movie-page=${
+  html += ` <li class="page-item${+page === totalPages ? " disabled" : ""}">
+  <a class="page-link" data-movie-page=${+page + 1} href="?page=${
     +page + 1
-  } data-movie-query="${query}" href="?page=${+page + 1}">Next</a>
+  }"  tabindex="-1" aria-disabled="true">Next</a>
 </li>`;
 
   elPagination.innerHTML = html;
+}
+
+function getFormData() {
+  const formData = new FormData(elForm);
+
+  return {
+    query: formData.get("name"),
+    year: formData.get("year"),
+    type: formData.get("type"),
+  };
 }
 
 document.addEventListener("click", (evt) => {
@@ -93,6 +106,23 @@ document.addEventListener("click", (evt) => {
   modalClose(evt);
   onPageClick(evt);
 });
+
+function debounce(func, timeout = 300) {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+function onInputKeyUp(evt) {
+  if (elInputMovie.value.length < 3) return;
+
+  searchMovies();
+}
 
 function modalOpen(evt) {
   const el = evt.target.closest("[data-movie-info]");
@@ -132,7 +162,7 @@ function onPageClick(evt) {
 
   evt.preventDefault();
 
-  searchMovies(el.dataset.movieQuery, el.dataset.moviePage);
+  searchMovies(el.dataset.moviePage);
 }
 
 async function fillModal(movieId, elModalSpinner) {
